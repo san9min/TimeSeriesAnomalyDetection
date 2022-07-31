@@ -1,0 +1,123 @@
+import torch
+from models.model import *
+import torch.nn.functional as F
+import numpy as np
+from util.metric import fbeta_score
+
+class ICMagent:
+
+    def __init__(self,args):
+
+        self.device = args.device
+
+        self.icm = ICMModel(args)
+        self.qnetwork = Qnetwork(args)
+        self.targetnetwork = Qnetwork(args)
+        self.targetnetwork.eval()
+        
+        self.eps = args.eps
+        self.eta = args.eta
+
+    def get_action(self,state,greedy = False):
+
+        state = torch.Tensor(state).to(self.device)
+        state = state.float()
+    
+        qvals = self.qnetwork(state)
+        if greedy:
+            action = torch.argmax(qvals,dim =1)    
+        else:
+            action = epsilon_greedy_policy(qvals,eps = self.eps)
+        
+        return action.data.cpu().numpy() # 0 or 1
+    
+    def get_intrinsic_reward(self,state,action,next_state):
+        state = torch.FloatTensor(state).to(self.device)
+        next_state = torch.FloatTensor(next_state).to(self.device)
+        action = self.action_one_hot_encoding(action.reshape(-1,1))
+
+        real_next_state_feature, pred_next_state_feature, _ = self.icm([state, action, next_state])
+        intrinsic_reward = self.eta * F.mse_loss(pred_next_state_feature,real_next_state_feature).unsqueeze(0) 
+        return intrinsic_reward.data.cpu().numpy()
+  
+    def action_one_hot_encoding(self,action): #dim(action) = batch,1
+        batch = len(action)
+        action_oh = torch.zeros([batch,2])
+        for i in range(batch):
+            j = action[i] 
+            action_oh[i][j] = 1        
+        return action_oh.to(dtype=torch.float, device = self.device)
+
+    def get_params(self):
+        params = list(self.icm.encoder.parameters()) + list(self.icm.forward_net.parameters()) + list(self.icm.inverse_net.parameters()) + list(self.qnetwork.parameters())
+        return params
+
+    def state_dict(self):
+      param_group = {'qnetwork' : self.qnetwork.state_dict(), 'icm' : self.icm.state_dict()}
+      return param_group 
+
+    def load_state_dict(self,params : dict):
+        self.qnetwork.load_state_dict(params['qnetwork'])
+        self.icm.load_state_dict(params['icm'])
+        print('loading complete')
+    
+    def train_mode(self):
+        self.qnetwork.train()
+        self.icm.train()
+
+    def eval_mode(self):
+        self.qnetwork.eval()
+        self.icm.eval()
+
+    def total_loss(self, args, q_loss, forward_loss, inverse_loss):
+        loss = args.lambda_ * q_loss + (1 - args.beta_) * inverse_loss + args.beta_ * forward_loss 
+        return loss
+
+    def compute_loss(self,args,loss_fns,replay):
+    
+        q_loss_func,f_loss_func,i_loss_func= loss_fns # loss functions unpack
+
+        state1_batch, action_batch, reward_batch, state2_batch = replay.get_batch() 
+        action_batch_value = action_batch.view(-1,1)
+        reward_batch = reward_batch.view(-1,1).to(self.device)
+
+        action_batch_one_hot = self.action_one_hot_encoding(action_batch_value)
+
+        real_next_state, pred_next_state, pred_action = self.icm([state1_batch, action_batch_one_hot, state2_batch])
+        #loss
+        forward_pred_err = f_loss_func(pred_next_state,real_next_state.detach())
+        forward_pred_err = forward_pred_err.mean(dim=1).view(-1,1)
+        i_reward = args.eta * forward_pred_err #batch,1
+        forward_pred_err = forward_pred_err.mean() * args.fscale
+
+        inverse_pred_err = i_loss_func(pred_action,action_batch_one_hot) * args.iscale
+        #reward.
+        
+        reward = i_reward.detach()
+        reward += reward_batch 
+        qvals = self.targetnetwork(state2_batch)  # 여기서 문제 
+        reward += args.gamma * torch.max(qvals,dim=1)[0].view(-1,1) #batch,1
+
+        reward_pred = self.qnetwork(state1_batch)
+        reward_target = reward_pred.clone() #batch,2
+        indices = torch.stack((torch.arange(action_batch_value.shape[0]),action_batch_value.squeeze(dim = 1)), dim=0)
+        indices = indices.tolist()
+        reward_target[indices] = reward.squeeze()
+
+        q_loss = q_loss_func(F.normalize(reward_pred), F.normalize(reward_target.detach())) * args.qscale
+
+        loss = self.total_loss(args,q_loss, forward_pred_err, inverse_pred_err)
+        return loss
+
+    def test(self,args,test_data):
+        
+        num_test = len(test_data)
+        for i in range(num_test):
+            _,state,label = test_data[i]
+            state = np.array(state)
+            state = state.reshape(-1,args.window_size,2)
+            a_pred = self.get_action(state,greedy = True)
+            a_true = label
+            score = fbeta_score(a_pred,a_true,args.beta)
+
+            print(score)
