@@ -9,25 +9,25 @@ def get_parse():
 
     #data
     args.datasets = 'Yahoo'  # Yahoo, SWaT, Numenta, KPI
-    args.using_data = 'A2'
+    args.using_data = 'A1'
     args.data_path = 'dataset/'
     args.window_size = 25
     args.split_ratio = 0.8
 
     #prtrain
-    args.pretrain = False
-    args.pre_trained_weights = 'FFF'
+    args.pretrain = True
+    args.pre_trained_weights = '/pretrained/bysangmin'
 
     #reward
     args.TP = 1.0
-    args.TN = 2e-3
-    args.FP = -2e-3
+    args.TN = 2e-1
+    args.FP = -2e-1
     args.FN = -1.0
 
-    #parameters
-    args.batch_size = 128
-    args.capacity = 500
-    args.anomaly_ratio = 0.5
+    #buffer
+    args.batch_size = 256
+    args.capacity = 1000
+    args.anomaly_ratio = 0.1
 
     #metric
     args.beta = 1

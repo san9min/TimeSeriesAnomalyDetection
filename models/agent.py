@@ -11,6 +11,7 @@ class ICMagent:
         self.device = args.device
 
         self.icm = ICMModel(args)
+        self.encoder = Encoder(args)
         self.qnetwork = Qnetwork(args)
         self.targetnetwork = Qnetwork(args)
         self.targetnetwork.eval()
@@ -22,8 +23,9 @@ class ICMagent:
 
         state = torch.Tensor(state).to(self.device)
         state = state.float()
-    
-        qvals = self.qnetwork(state)
+        state = self.encoder(state)
+
+        qvals = self.qnetwork(state.detach())
         if greedy:
             action = torch.argmax(qvals,dim =1)    
         else:
@@ -35,6 +37,9 @@ class ICMagent:
         state = torch.FloatTensor(state).to(self.device)
         next_state = torch.FloatTensor(next_state).to(self.device)
         action = self.action_one_hot_encoding(action.reshape(-1,1))
+
+        state = self.encoder(state)
+        next_state = self.encoder(next_state)
 
         real_next_state_feature, pred_next_state_feature, _ = self.icm([state, action, next_state])
         intrinsic_reward = self.eta * F.mse_loss(pred_next_state_feature,real_next_state_feature).unsqueeze(0) 
@@ -49,25 +54,28 @@ class ICMagent:
         return action_oh.to(dtype=torch.float, device = self.device)
 
     def get_params(self):
-        params = list(self.icm.encoder.parameters()) + list(self.icm.forward_net.parameters()) + list(self.icm.inverse_net.parameters()) + list(self.qnetwork.parameters())
+        params = list(self.encoder.parameters()) + list(self.icm.forward_net.parameters()) + list(self.icm.inverse_net.parameters()) + list(self.qnetwork.parameters())
         return params
 
     def state_dict(self):
-      param_group = {'qnetwork' : self.qnetwork.state_dict(), 'icm' : self.icm.state_dict()}
+      param_group = {'qnetwork' : self.qnetwork.state_dict(), 'icm' : self.icm.state_dict(), 'encoder' : self.encoder.state_dict()}
       return param_group 
 
     def load_state_dict(self,params : dict):
         self.qnetwork.load_state_dict(params['qnetwork'])
         self.icm.load_state_dict(params['icm'])
-        print('loading complete')
+        self.encoder.load_state_dict(params['encoder'])
+        print('Weight loading complete!')
     
     def train_mode(self):
         self.qnetwork.train()
         self.icm.train()
+        self.encoder.train()
 
     def eval_mode(self):
         self.qnetwork.eval()
         self.icm.eval()
+        self.encoder.eval()
 
     def total_loss(self, args, q_loss, forward_loss, inverse_loss):
         loss = args.lambda_ * q_loss + (1 - args.beta_) * inverse_loss + args.beta_ * forward_loss 
@@ -83,6 +91,9 @@ class ICMagent:
 
         action_batch_one_hot = self.action_one_hot_encoding(action_batch_value)
 
+        state1_batch = self.encoder(state1_batch)
+        state2_batch = self.encoder(state2_batch)
+
         real_next_state, pred_next_state, pred_action = self.icm([state1_batch, action_batch_one_hot, state2_batch])
         #loss
         forward_pred_err = f_loss_func(pred_next_state,real_next_state.detach())
@@ -95,16 +106,17 @@ class ICMagent:
         
         reward = i_reward.detach()
         reward += reward_batch 
-        qvals = self.targetnetwork(state2_batch)  # 여기서 문제 
+        qvals = self.targetnetwork(state2_batch.detach())  # 여기서 문제 
         reward += args.gamma * torch.max(qvals,dim=1)[0].view(-1,1) #batch,1
 
-        reward_pred = self.qnetwork(state1_batch)
+        reward_pred = self.qnetwork(state1_batch.detach())
         reward_target = reward_pred.clone() #batch,2
         indices = torch.stack((torch.arange(action_batch_value.shape[0]),action_batch_value.squeeze(dim = 1)), dim=0)
         indices = indices.tolist()
         reward_target[indices] = reward.squeeze()
 
-        q_loss = q_loss_func(F.normalize(reward_pred), F.normalize(reward_target.detach())) * args.qscale
+        q_loss = q_loss_func(reward_pred, reward_target.detach()) * args.qscale    
+        # q_loss = q_loss_func(F.normalize(reward_pred), F.normalize(reward_target.detach())) * args.qscale
 
         loss = self.total_loss(args,q_loss, forward_pred_err, inverse_pred_err)
         return loss

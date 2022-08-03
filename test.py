@@ -9,8 +9,6 @@ from models.agent import ICMagent
 
 def test(args):
     print("Test start!")
-    print("I use F_beta scroe as metric")
-
     
     if args.datasets == 'Yahoo':
         _,test = build_yahoo(args)
@@ -48,8 +46,10 @@ def test(args):
 
     f1_score = torch.mean((precision * recall * (2)).div(precision + recall)).item()
 
-    print(f1_score)    
-
+    print(f"Precision : {precision.item()}")
+    print(f"Recall : {recall.item()}")
+    print(f"F1-score : {f1_score}")    
+    
 
 if __name__ == '__main__': 
     args = get_parse()

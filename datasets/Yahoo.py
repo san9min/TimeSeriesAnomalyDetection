@@ -17,13 +17,7 @@ import matplotlib.pyplot as plt
 
 def build_yahoo(args): 
     train, test = Yahoo_Dataprocessing(args) # divide data into train, test : list of sets
-    # e = 0
-    # v = train[e]['value']
-    # l = train[e]['label']
-    # fig, ax = plt.subplots(2)
-    # ax[0].plot(v)
-    # ax[1].plot(l,'g')
-    # plt.show()
+
     train = sliding_window(train, args)  # sliding window
     test = sliding_window(test, args)
 
@@ -102,6 +96,5 @@ def Yahoo_Dataprocessing(args):
                 'value': minmax_scale(df['value'].tolist()),
                 'label': df['is_anomaly'].tolist()
                 })
-    # assert len(train) + len(test)  == 167, 'Error'
 
     return train, test
