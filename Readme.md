@@ -1,6 +1,6 @@
-# Anomaly_Detection
+# Anomaly Detection 
 
-**Anomaly Detection with Reinforcement Learning for time series**
+**Time Series Anomaly Detection with Reinforcement Learning**
 
 YAI 9기 이상민
 
@@ -16,13 +16,17 @@ I tried using Intrinsic Curiosity Module, which uses intrinsic rewards to solve 
 
 ---
 
-## Model
+## Main
 
-![model](https://user-images.githubusercontent.com/92682815/182004788-fac8fa81-793c-4029-af67-acb9d9c355a4.png)
-
-* LSTM used as Q-net
+![model](https://user-images.githubusercontent.com/92682815/182543308-2bab3cf1-e151-461f-a778-77342035d275.jpg)
+* LSTM used as encoder
 * Action taken by Q-value and eps-greedy policy
 * Total Reward = intrinsic(agent's pred err) + extrinsic(env)
+<div>
+<img src = "https://user-images.githubusercontent.com/92682815/182543366-aeb40527-c909-40c8-a5c8-23c887e1ffce.jpg" height = 20%/>
+
+* encoder trained by inverse model in ICM
+</div>
 
 ---
 
@@ -30,9 +34,9 @@ I tried using Intrinsic Curiosity Module, which uses intrinsic rewards to solve 
 
 F1-scoring ; Harmonic mean of Precision and Recall
 
-$$\text{F1 score } = \frac {2}{(\frac{1}{Precision} + \frac{1}{Recall})}$$
+$$\huge{\text{F1 score } = \frac {2}{(\frac{1}{Precision} + \frac{1}{Recall})} \\ = 2 \times \frac{Precison \times Recall}{Precision + Recall}} $$
 
-$$\text{where } Precision = \frac{TP}{TP+FP} \text{ and } Recall = \frac{TP}{TP+FN}$$
+$$\LARGE{\text{where } Precision = \frac{TP}{TP+FP} \text{ and } Recall = \frac{TP}{TP+FN}}$$
 
 ---
 
