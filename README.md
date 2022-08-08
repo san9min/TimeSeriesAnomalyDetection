@@ -36,15 +36,15 @@ I use two buffers; Anomalous buffer and Normal buffer. Agent's anomalous exprien
 
 ![buffer](https://user-images.githubusercontent.com/92682815/183408236-766c2548-52a7-4987-9139-d4660c13a4cd.jpg)
 
-* Store separately anomalous experience and normal experience in two buffers
+* Store experiences in two buffers. anomalous experiences in one buffer and normal experiences in the other
 * Sampling anomaly data and not anomaly data from each buffers
-* batch size = $\alpha \times$  batch size + $(1-\alpha) \times$ batch size where $\alpha$ is anomaly samples ratio that you want  
+* batch = $\alpha \times$  batch size + $(1-\alpha) \times$ batch size where $\alpha$ is anomaly samples ratio that you want  
 
 ---
 
 ## Metric
 
-F1-scoring ; Harmonic mean of Precision and Recall
+**F1-Score** : Harmonic mean of Precision and Recall
 
 $$\LARGE{\text{F1 score } = \frac {2}{(\frac{1}{Precision} + \frac{1}{Recall})} \\ = 2 \times \frac{Precison \times Recall}{Precision + Recall}} $$
 
