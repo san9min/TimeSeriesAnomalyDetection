@@ -18,7 +18,7 @@ I use two buffers; Anomalous buffer and Normal buffer. Agent's anomalous exprien
     - if you need to never miss anomalies, then just give more negative reward to False Negative
    
  2. Sampling anomaly data as much as you want : *Replay Buffer*
-    - One of the reason anomaly detection problem is so hard is excessively unbalanced data to train the model.
+    - One of the reason anomaly detection problem is so hard is excessively unbalanced data to train the model. By separately memorizing anomalous and normal experinces, we can control the ratio of anomaly data in batch when training. 
 
 ---
 
@@ -120,7 +120,10 @@ util
 models              
    agent.py      
    env.py         
-   model.py                      
+   model.py      
+   
+pretrained
+    Super-state
 
 main.py
 test.py
