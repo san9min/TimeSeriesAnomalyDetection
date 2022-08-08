@@ -92,6 +92,43 @@ For Time series (labeled) Anomaly detection Datasets from AIOps Challenge
     python test.py
 
 ---
+## Structure
+<pre>
+<code>
+dataset
+    A1Benchmark
+        real_#.csv
+    A2Benchmark
+        synthetic_#.csv
+    AIOps
+        KPI.csv
+
+
+datasets
+   KPI.py
+   Yahoo.py
+   build_data.py
+
+util                         
+   ExperienceReplay.py      
+   metric.py
+   misc.py
+   sliding_window.py
+
+
+models              
+   agent.py      
+   env.py         
+   model.py                      
+
+main.py
+test.py
+config.py
+
+</code>
+</pre>
+
+---
 
 ## Reference
 
