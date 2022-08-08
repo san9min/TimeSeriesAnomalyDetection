@@ -2,7 +2,7 @@ import torch
 import numpy as np
 
 
-class Yahoo_ENV:
+class ENV:
     def __init__(self,state_set,label_set,args):
         self.state = state_set
         self.label = label_set

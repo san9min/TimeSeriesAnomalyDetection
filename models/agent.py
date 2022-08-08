@@ -65,7 +65,7 @@ class ICMagent:
         self.qnetwork.load_state_dict(params['qnetwork'])
         self.icm.load_state_dict(params['icm'])
         self.encoder.load_state_dict(params['encoder'])
-        print('Weight loading complete!')
+        print('Weights loading success!')
     
     def train_mode(self):
         self.qnetwork.train()

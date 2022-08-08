@@ -1,24 +1,28 @@
 import torch
 import numpy as np
 
-
 from config import get_parse
-from datasets.Yahoo import build_yahoo
+from datasets.build_data import load_data
 from models.agent import ICMagent
 
 
-def test(args):
+def TEST_ALL(args):
     print("Test start!")
-    
-    if args.datasets == 'Yahoo':
-        _,test = build_yahoo(args)
 
     agent = ICMagent(args)
-
+    print('Hello, I was made by sangmin')
     if args.pretrain :
         agent.load_state_dict(torch.load(args.pre_trained_weights))
         agent.eval_mode()
-    
+    print('-'*50)
+    for data_name in args.test_data_names :
+        args.datasets = data_name
+        test(args,agent)
+
+def test(args,agent):
+
+    print(f"Data : {args.datasets}")
+    _, test = load_data(args)
 
     truepositive = 0
     tp_plus_fp = 0
@@ -39,18 +43,18 @@ def test(args):
             truepositive += (y_pred * y_true).sum()
             tp_plus_fp += y_pred.sum()
             tp_plus_fn += y_true.sum()
+
     precision = truepositive.div(tp_plus_fp + 1e-11)
     recall = truepositive.div(tp_plus_fn + 1e-11)
-
-
 
     f1_score = torch.mean((precision * recall * (2)).div(precision + recall)).item()
 
     print(f"Precision : {precision.item()}")
     print(f"Recall : {recall.item()}")
     print(f"F1-score : {f1_score}")    
+    print('-'*50)
     
 
 if __name__ == '__main__': 
     args = get_parse()
-    test(args)
+    TEST_ALL(args)

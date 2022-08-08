@@ -8,14 +8,13 @@ def get_parse():
     args.device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     #data
-    args.datasets = 'Yahoo'  # Yahoo, SWaT, Numenta, KPI
-    args.using_data = 'A1'
+    args.datasets = 'KPI'  # Yahoo A1, Yahoo A2, KPI, SWaT, Numenta, 
     args.data_path = 'dataset/'
     args.window_size = 25
     args.split_ratio = 0.8
 
     #prtrain
-    args.pretrain = False
+    args.pretrain = True
     args.pre_trained_weights = 'Check-point_A1'
 
     #reward
@@ -50,6 +49,9 @@ def get_parse():
     args.epochs = 2000
     args.gamma = 0.8 # for Q networ train
     args.lr = 1e-3
+
+    #test
+    args.test_data_names = ['Yahoo A1', 'Yahoo A2', 'KPI'] #list
 
     return args    
 

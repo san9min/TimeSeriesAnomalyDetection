@@ -1,6 +1,3 @@
-from audioop import minmax
-import matplotlib
-from sklearn.tree import plot_tree
 import torch
 import pandas as pd 
 import numpy as np
@@ -12,8 +9,6 @@ import os
 import glob
 
 from util.sliding_window import sliding_window 
-
-import matplotlib.pyplot as plt
 
 def build_yahoo(args): 
     train, test = Yahoo_Dataprocessing(args) # divide data into train, test : list of sets
@@ -52,24 +47,17 @@ class YahooDataset(Dataset):
 
         return time_stamp, value, label
 
-
 def Yahoo_Dataprocessing(args):
-    
-    files_a1 = glob.glob(os.path.join(args.data_path,"A1Benchmark/real_*.csv"))  #list
-    files_a1.sort()
-    files_a2 = glob.glob(os.path.join(args.data_path,"A2Benchmark/synthetic_*.csv"))
-    files_a2.sort()
-
-    split_bar = np.array([len(files_a1),len(files_a2)])
-    split_bar = args.split_ratio * split_bar
-    split_bar = np.asarray(split_bar,dtype = int)
 
     train = []    
     test = []
-    if args.using_data == 'A1':
+    if 'A1' in args.datasets:
+        files_a1 = glob.glob(os.path.join(args.data_path,"A1Benchmark/real_*.csv"))  #list
+        files_a1.sort()
+        split_bar = int(args.split_ratio * len(files_a1))
         for i, fn  in enumerate(files_a1):
             df = pd.read_csv(fn)
-            if i < split_bar[0]: # train
+            if i < split_bar: # train
                 train.append({
                 'timestamp': df['timestamp'].tolist(),
                 'value': minmax_scale(df['value'].tolist()),
@@ -81,10 +69,14 @@ def Yahoo_Dataprocessing(args):
                 'value': minmax_scale(df['value'].tolist()),
                 'label': df['is_anomaly'].tolist()
                 })
-    elif args.using_data == 'A2':
+
+    elif 'A2' in args.datasets:
+        files_a2 = glob.glob(os.path.join(args.data_path,"A2Benchmark/synthetic_*.csv"))
+        files_a2.sort()
+        split_bar = int(args.split_ratio * len(files_a2))
         for i, fn in enumerate(files_a2):
             df = pd.read_csv(fn)
-            if i < split_bar[1]: # train
+            if i < split_bar: # train
                 train.append({
                 'timestamp': df['timestamp'].tolist(),
                 'value': minmax_scale(df['value'].tolist()),
