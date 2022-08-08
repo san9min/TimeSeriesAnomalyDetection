@@ -12,7 +12,7 @@ I thought the time seires anomaly detection and sparse reward problem of reinfor
  
 So, I must re-approach  to solve this problem. I have put out the encoder from ICM and make it shared by DQN and ICM. Encoder(I use LSTM) is trained with inverse model in ICM by supervised learning and can extract proper features. With these features, Q-function in DQN approximates Q-value better.  
 
-I use two buffers; Anomalous buffer and Normal buffer. Agent's anomalous exprience is memorized in Anomalous buffer and normal experience in Normal buffer. When training, the agent sample batch( $\alpha$ % anomaly) where $\alpha$ is determined by your choice.
+I use two buffers; Anomalous buffer and Normal buffer. Agent's anomalous exprience is memorized in Anomalous buffer and normal experience in Normal buffer. When training, the agent samples batch( $\alpha$ % anomaly) where $\alpha$ is determined by your choice.
  
  1. Easy to control : *Reward*
     - if you need to never miss anomalies, then just give more negative reward to False Negative
