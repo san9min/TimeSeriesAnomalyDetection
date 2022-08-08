@@ -15,7 +15,7 @@ def get_parse():
 
     #prtrain
     args.pretrain = True
-    args.pre_trained_weights = '/pretrained/Super'
+    args.pre_trained_weights = '/pretrained/Super-state'
 
     #reward
     args.TP = 1.0
