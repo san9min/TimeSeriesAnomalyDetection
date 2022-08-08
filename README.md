@@ -30,7 +30,7 @@ I use two buffers; Anomalous buffer and Normal buffer. Agent's anomalous exprien
 - Action taken by Q-value and eps-greedy policy
 - Total Reward = intrinsic(agent's pred err) + extrinsic(env)
 
-<img src = "https://user-images.githubusercontent.com/92682815/182543366-aeb40527-c909-40c8-a5c8-23c887e1ffce.jpg" height = 20%/>
+![Encoder](https://user-images.githubusercontent.com/92682815/182543366-aeb40527-c909-40c8-a5c8-23c887e1ffce.jpg)
 
 - encoder trained by inverse model in ICM
 
@@ -50,6 +50,8 @@ $$\LARGE{\text{F1 score } = \frac {2}{(\frac{1}{Precision} + \frac{1}{Recall})} 
 
 $$\large{\text{where } Precision = \frac{TP}{TP+FP} \text{ and } Recall = \frac{TP}{TP+FN}}$$
 
+
+</br>
 
 ||Yahoo A1|Yahoo A2|AIOps KPI|
 |---|---|---|---|
@@ -124,7 +126,6 @@ models
 main.py
 test.py
 config.py
-
 </code>
 </pre>
 
