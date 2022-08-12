@@ -2,7 +2,9 @@
 
 **Time Series Anomaly Detection with Reinforcement Learning**
 
-YAI 9기 이상민
+Yonsei university Artificial Intelligence 9th 이상민  
+
+*Summer,2022*
 
 ---
 
@@ -27,12 +29,12 @@ I use two buffers; Anomalous buffer and Normal buffer. Agent's anomalous exprien
 ![model](https://user-images.githubusercontent.com/92682815/182543308-2bab3cf1-e151-461f-a778-77342035d275.jpg)
 
 - LSTM used as encoder
-- Action taken by Q-value and eps-greedy policy
-- Total Reward = intrinsic(agent's pred err) + extrinsic(env)
+- Action taken by eps-greedy policy with Q-value
+- Total Reward = Intrinsic Reward(agent's pred err) + Extrinsic Reward(environment)
 
 ![Encoder](https://user-images.githubusercontent.com/92682815/182543366-aeb40527-c909-40c8-a5c8-23c887e1ffce.jpg)
 
-- encoder trained by inverse model in ICM
+- encoder trained with inverse model in ICM
 
 ![buffer](https://user-images.githubusercontent.com/92682815/183408236-766c2548-52a7-4987-9139-d4660c13a4cd.jpg)
 
@@ -52,6 +54,9 @@ $$\large{\text{where } Precision = \frac{TP}{TP+FP} \text{ and } Recall = \frac{
 
 
 </br>
+
+**Super-state**  
+
 
 ||Yahoo A1|Yahoo A2|AIOps KPI|
 |---|---|---|---|
@@ -98,12 +103,12 @@ For Time series (labeled) Anomaly detection Datasets from AIOps Challenge
 <pre>
 <code>
 dataset
-    A1Benchmark
-        real_#.csv
-    A2Benchmark
-        synthetic_#.csv
-    AIOps
-        KPI.csv
+   A1Benchmark
+       real_#.csv
+   A2Benchmark
+       synthetic_#.csv
+   AIOps
+       KPI.csv
 
 
 datasets
@@ -136,3 +141,5 @@ config.py
 ## Reference
 
 - _[Curiosity-driven Exploration by Self-supervised Prediction](https://arxiv.org/abs/1705.05363)_
+- _[Playing Atari with Deep Reinforcement Learning](https://arxiv.org/abs/1312.5602)_
+
