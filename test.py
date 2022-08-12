@@ -6,11 +6,11 @@ from datasets.build_data import load_data
 from models.agent import ICMagent
 
 
-def TEST_ALL(args):
+def main_test(args):
     print("Test start!")
 
     agent = ICMagent(args)
-    print('Hello, I was made by sangmin')
+    print("Hello, I'm AgentX made by sangmin")
     if args.pretrain :
         agent.load_state_dict(torch.load(args.pre_trained_weights))
         agent.eval_mode()
@@ -57,4 +57,4 @@ def test(args,agent):
 
 if __name__ == '__main__': 
     args = get_parse()
-    TEST_ALL(args)
+    main_test(args)
