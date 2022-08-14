@@ -4,13 +4,13 @@
 
 Yonsei university Artificial Intelligence 9th 이상민  
 
-*Summer,2022*
+*Summer, 2022*
 
 ---
 
 ## Introduction
 
-I thought the time seires anomaly detection and sparse reward problem of reinforcement learning had analogy. Many cases(time stamps) are not anomaly, so if our agent could get rewards only at anomaly points, time series anomaly detection would be sparse reward problem. I tried using Intrinsic Curiosity Module, which uses intrinsic rewards to solve the sparse rewards problem. In the beginning, to make the time series anoamly detection task a sparse reward problem, I approximated TN reward and FP to zero, which just sent positive (+ $\epsilon$ <<1) and negative signal (- $\epsilon$ ). But then the agent went to anomaly too much (and so Recall $\approx$ 1).
+I thought the time seires anomaly detection and sparse reward problem of reinforcement learning had analogy. Many cases(time stamps) are not anomaly, so if our agent could get rewards only at anomaly points, time series anomaly detection would be sparse reward problem. I tried using Intrinsic Curiosity Module, which uses intrinsic rewards to solve the sparse rewards problem. In the beginning, to make the time series anoamly detection task a sparse reward problem, I approximated TN reward and FP reward to zero, which just sent positive (+ $\epsilon$ <<1) and negative signal (- $\epsilon$ ). But then the agent went to anomaly too much (and so Recall $\approx$ 1).
  
 So, I must re-approach  to solve this problem. I have put the encoder out from ICM and make it shared by DQN and ICM. Encoder(I use LSTM) is trained with inverse model in ICM by supervised learning and can extract proper features. With these features, Q-function in DQN approximates Q-value better.  
 
@@ -30,7 +30,7 @@ I use two buffers; Anomalous buffer and Normal buffer. Agent's anomalous exprien
 
 - LSTM used as encoder
 - Action taken by eps-greedy policy with Q-value
-- Total Reward = Intrinsic Reward(agent's pred err) + Extrinsic Reward(environment)
+- Total Reward = Intrinsic Reward(agent's prediction error) + Extrinsic Reward(environment)
 
 ![Encoder](https://user-images.githubusercontent.com/92682815/182543366-aeb40527-c909-40c8-a5c8-23c887e1ffce.jpg)
 
