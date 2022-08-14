@@ -15,7 +15,7 @@ def get_parse():
 
     #prtrain
     args.pretrain = True
-    args.pre_trained_weights = '/pretrained/Super-state'
+    args.pre_trained_weights = 'pretrained/Super-state'
 
     #reward
     args.TP = 1.0
@@ -32,7 +32,7 @@ def get_parse():
     args.beta = 1
 
     #ICM
-    args.lambda_ = 0.1 #Q loss
+    args.lambda_ = 0.1 # Q loss
     args.beta_ = 0.2  #inverse, forward loss
     args.eta = 1.0
 
