@@ -58,11 +58,6 @@ $$\large{\text{where } Precision = \frac{TP}{TP+FP} \text{ and } Recall = \frac{
 **Super-state**  
 
 
-||Yahoo A1|Yahoo A2|AIOps KPI|
-|---|---|---|---|
-|**Precision**|0.87|0.56|0.96|
-|**Recall**|0.84|0.56|0.96|
-|**F1-score**|0.85|0.56|0.96|
 
 
 
