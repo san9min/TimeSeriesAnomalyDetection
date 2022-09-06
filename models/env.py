@@ -21,7 +21,7 @@ class ENV:
         
         
     def reset(self): #initial state
-        return self.state[0].reshape(1,self.window_size,2) #(1,-1,1)
+        return self.state[0].transpose().reshape(1,self.window_size,2) #(1,-1,1)
     
     def step(self,idx,action): 
         a_pred = action
@@ -33,7 +33,7 @@ class ENV:
             next_state = None
         else:
             done = False
-            next_state = self.state[idx+1].reshape(1,self.window_size,2)
+            next_state = self.state[idx+1].transpose().reshape(1,self.window_size,2)
         return next_state, reward, done, a_real
 
     def get_reward(self,action_pred,action_real):
