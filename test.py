@@ -32,7 +32,7 @@ def test(args,agent):
         _,state_set,label_set = test[i]
         label_set = np.expand_dims(label_set,axis = 1)
         for j in range(len(state_set)):
-            state = state_set[j].reshape(1,args.window_size,2)
+            state = state_set[j].transpose().reshape(1,args.window_size,2)
 
             y_true = label_set[j]
             y_true = torch.FloatTensor(y_true).squeeze().float()
