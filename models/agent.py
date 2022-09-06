@@ -96,18 +96,15 @@ class ICMagent:
 
         real_next_state, pred_next_state, pred_action = self.icm([state1_batch, action_batch_one_hot, state2_batch])
         #loss
-        forward_pred_err = f_loss_func(pred_next_state,real_next_state.detach())
-        forward_pred_err = forward_pred_err.mean(dim=1).view(-1,1)
-        i_reward = args.eta * forward_pred_err #batch,1
-        forward_pred_err = forward_pred_err.mean() * args.fscale
+        
+        forward_pred_err = f_loss_func(pred_next_state,real_next_state.detach()) * args.fscale
 
         inverse_pred_err = i_loss_func(pred_action,action_batch_one_hot) * args.iscale
-        #reward.
         
-        reward = i_reward.detach()
-        reward += reward_batch 
-        qvals = self.targetnetwork(state2_batch.detach())  # 여기서 문제 
-        reward += args.gamma * torch.max(qvals,dim=1)[0].view(-1,1) #batch,1
+        #reward.
+        reward = reward_batch 
+        qvals = self.targetnetwork(state2_batch.detach())
+        reward += args.gamma * torch.max(qvals,dim=1)[0].view(-1,1) 
 
         reward_pred = self.qnetwork(state1_batch.detach())
         reward_target = reward_pred.clone() #batch,2
@@ -116,20 +113,6 @@ class ICMagent:
         reward_target[indices] = reward.squeeze()
 
         q_loss = q_loss_func(reward_pred, reward_target.detach()) * args.qscale    
-        # q_loss = q_loss_func(F.normalize(reward_pred), F.normalize(reward_target.detach())) * args.qscale
 
         loss = self.total_loss(args,q_loss, forward_pred_err, inverse_pred_err)
         return loss
-
-    def test(self,args,test_data):
-        
-        num_test = len(test_data)
-        for i in range(num_test):
-            _,state,label = test_data[i]
-            state = np.array(state)
-            state = state.reshape(-1,args.window_size,2)
-            a_pred = self.get_action(state,greedy = True)
-            a_true = label
-            score = fbeta_score(a_pred,a_true,args.beta)
-
-            print(score)
