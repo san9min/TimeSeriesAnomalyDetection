@@ -9,7 +9,8 @@ from datasets.build_data import load_data
 from models.env import ENV
 from models.agent import ICMagent
 from util.ExperienceReplay import ReplayMemory
-from util.metric import fbeta_score
+from test import main_test
+
 
 def main(args):
     train, test = load_data(args)
@@ -23,7 +24,7 @@ def main(args):
         agent.train_mode()
         
     #loss and optim
-    f_loss_func = nn.MSELoss(reduction = 'none').to(args.device)
+    f_loss_func = nn.MSELoss().to(args.device)
     i_loss_func = nn.CrossEntropyLoss().to(args.device)
     q_loss_func = nn.MSELoss().to(args.device)
     loss_fns = (q_loss_func,f_loss_func,i_loss_func)
@@ -57,7 +58,7 @@ def main(args):
             env.render(reward)
             state = next_state  
             
-            if (i+j+1) % 20 == 0:
+            if (i+j+1) % 5 == 0:
                 agent.targetnetwork.load_state_dict(agent.qnetwork.state_dict())
         scheduler.step()
         args.eps *= args.eps_decay
@@ -66,12 +67,8 @@ def main(args):
         print(f"{e+1} th episode ends")
         print('*'*50)        
         rewards_memory.append(sum(env.reward_hist))
-
-        if e % 5 == 0:
-          torch.save(agent.state_dict(),'Check-point_'+str(e))
-    torch.save(agent.state_dict(),'Check-point_'+ args.datasets)       
-    agent.eval_mode()
-    agent.test(args,test)
+    
+    torch.save(agent.state_dict(),'Check-point_'+ args.datasets) 
 
 if __name__ == '__main__': 
     args = get_parse()
